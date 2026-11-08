@@ -1,0 +1,16 @@
+---
+// /projects/ : full list of every project in the collection.
+import Base from "../../layouts/Base.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import { getCollection } from "astro:content";
+
+const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
+---
+<Base title="Projects · Vishnu Suresh">
+  <h1>Projects</h1>
+  <section>
+    <div class="cards">
+      {projects.map((p) => <ProjectCard id={p.id} {...p.data} />)}
+    </div>
+  </section>
+</Base>

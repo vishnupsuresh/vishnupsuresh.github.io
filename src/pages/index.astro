@@ -1,0 +1,101 @@
+---
+// Home page: about, experience, featured projects, leadership, contact.
+// Experience and leadership live here as plain data arrays rather than a
+// content collection: they're short and rarely change, so separate files
+// would add overhead without benefit.
+import Base from "../layouts/Base.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { getCollection } from "astro:content";
+
+const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
+const featured = projects.slice(0, 4);
+
+const GITHUB = "https://github.com/vishnupsuresh";
+const LINKEDIN = "https://www.linkedin.com/in/YOUR-LINKEDIN"; // TODO
+const EMAIL = "vishnups0001@gmail.com";
+
+const experience = [
+  {
+    role: "College Aide, IT",
+    org: "NYC Department of Youth and Community Development",
+    dates: "Present", // TODO: add start date
+    points: [
+      "Support ~100 laptops and phones and ~300 PCs; resolve ~25 tickets per week.",
+      "Manage Intune/MDM compliance and Conditional Access; image machines with SCCM and MDT.",
+      "Administer Microsoft 365: Exchange mailboxes, Teams, and account access.",
+      "Built an Excel inventory database for device assignments, now used by IT across the agency.",
+    ],
+  },
+  {
+    role: "Math Instructor",
+    org: "Mathnasium",
+    dates: "Jul 2024 – Aug 2025",
+    points: ["Taught K–12 students one-on-one and in small groups, adapting lessons to each student's level."],
+  },
+];
+
+const leadership = [
+  { title: "IEEE Student Branch", role: "Board Member" },
+  { title: "Cooper OPS", role: "Instructor", note: "Co-teach technical sessions, including one on number systems." },
+  { title: "Cooper Union Basketball Club", role: "Founder" },
+  { title: "ACM Student Chapter", role: "Founder (in progress)", note: "Starting Cooper Union's first ACM chapter." },
+];
+---
+<Base>
+  <header>
+    <h1>Vishnu Suresh</h1>
+    <p class="tagline">Computer Science @ The Cooper Union · New York</p>
+    <div class="links">
+      <a class="btn" href="/resume.pdf" target="_blank" rel="noopener">Resume</a>
+      <a class="btn" href={GITHUB} target="_blank" rel="noopener">GitHub</a>
+      <a class="btn" href={LINKEDIN} target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn" href={`mailto:${EMAIL}`}>Email</a>
+    </div>
+  </header>
+
+  <section>
+    <h2>About</h2>
+    <p>
+      I'm a Computer Science undergraduate at The Cooper Union. I work across hardware, machine learning,
+      and enterprise IT: I've designed a pipelined 32-bit CPU in SystemVerilog, built CNN models for EEG
+      classification, and manage devices for a New York City agency. I'm looking for Summer 2027 internships
+      in software, data, and ML.
+    </p>
+  </section>
+
+  <section>
+    <h2>Experience</h2>
+    {experience.map((e) => (
+      <div class="item">
+        <div class="item-head">
+          <h3>{e.role} · {e.org}</h3>
+          <span class="meta">{e.dates}</span>
+        </div>
+        <ul>{e.points.map((p) => <li>{p}</li>)}</ul>
+      </div>
+    ))}
+  </section>
+
+  <section>
+    <h2>Projects</h2>
+    <div class="cards">
+      {featured.map((p) => <ProjectCard id={p.id} {...p.data} />)}
+    </div>
+    <p><a href="/projects/">All projects →</a></p>
+  </section>
+
+  <section>
+    <h2>Leadership</h2>
+    {leadership.map((l) => (
+      <div class="item">
+        <h3>{l.title} · {l.role}</h3>
+        {l.note && <p>{l.note}</p>}
+      </div>
+    ))}
+  </section>
+
+  <section>
+    <h2>Contact</h2>
+    <p>Email <a href={`mailto:${EMAIL}`}>{EMAIL}</a> or reach out on <a href={LINKEDIN}>LinkedIn</a>.</p>
+  </section>
+</Base>

@@ -1,0 +1,29 @@
+---
+// Dynamic route: generates one static page per Markdown file at build time.
+// GitHub Pages only serves static files, so getStaticPaths is required:
+// it tells Astro every URL to pre-render.
+import Base from "../../layouts/Base.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((p) => ({ params: { id: p.id }, props: { project: p } }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const { title, summary, date, tags, repo } = project.data;
+---
+<Base title={`${title} · Vishnu Suresh`} description={summary}>
+  <p style="margin-top:2rem"><a href="/projects/">← All projects</a></p>
+  <h1 style="margin-top:0.5rem">{title}</h1>
+  <p class="tagline">{summary}</p>
+  <p class="meta">
+    {date}
+    {repo && <> · <a href={repo} target="_blank" rel="noopener">Source code</a></>}
+  </p>
+  <div class="tags">{tags.map((t) => <span class="tag">{t}</span>)}</div>
+  <article class="prose">
+    <Content />
+  </article>
+</Base>
