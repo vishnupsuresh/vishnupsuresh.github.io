@@ -1,6 +1,10 @@
 ---
-// Shared layout: every page wraps its content in this.
-// Keeping nav, footer, and CSS here means one edit updates the whole site.
+// Shared layout: nav, footer, fonts, and all site-wide CSS.
+// Fonts are self-hosted through @fontsource (bundled at build time), so the
+// site makes no requests to Google Fonts: faster first paint, no third-party tracking.
+import "@fontsource-variable/archivo/wdth.css";        // Archivo with width + weight axes
+import "@fontsource-variable/jetbrains-mono";          // used only inside the bit diagram
+
 interface Props {
   title?: string;
   description?: string;
@@ -10,7 +14,6 @@ const {
   description = "Vishnu Suresh: Computer Science at The Cooper Union.",
 } = Astro.props;
 
-// Highlight the active nav link by comparing against the current path.
 const path = Astro.url.pathname;
 const nav = [
   { href: "/", label: "Home" },
@@ -33,91 +36,125 @@ const nav = [
   </head>
   <body>
     <nav>
-      <div class="inner">
-        <a class="name" href="/">Vishnu Suresh</a>
+      <div class="wrap nav-inner">
+        <a class="nav-name" href="/">Vishnu Suresh</a>
         <ul>
           {nav.map((n) => (
-            <li>
-              <a href={n.href} class={path === n.href ? "active" : ""}>{n.label}</a>
-            </li>
+            <li><a href={n.href} aria-current={path === n.href ? "page" : undefined}>{n.label}</a></li>
           ))}
         </ul>
       </div>
     </nav>
-    <main>
+    <main class="wrap">
       <slot />
     </main>
-    <footer>© {new Date().getFullYear()} Vishnu Suresh</footer>
+    <footer class="wrap">
+      <div class="foot">
+        <span>© {new Date().getFullYear()} Vishnu Suresh</span>
+        <span>Built with Astro, hosted on GitHub Pages</span>
+      </div>
+    </footer>
   </body>
 </html>
 
-<!--
-  is:global applies these styles site-wide. Astro scopes <style> to the component
-  by default, which would stop them reaching page content passed through <slot />.
--->
 <style is:global>
+  /* ---------- Tokens ---------- */
   :root {
-    --bg: #fbfbf9; --text: #1d1d1b; --muted: #5f5f5a;
-    --line: #e3e2dc; --accent: #1f5fbf; --card: #ffffff; --max: 760px;
+    --paper: #f4f6f8;
+    --ink: #18202c;
+    --graphite: #586273;
+    --rule: #d6dbe1;
+    --bit-off: #e3e7ec;
+    --trace: #1f6f55;          /* solder-mask green: the only accent */
+    --wrap: 960px;
+    --rail: 180px;             /* left column for section headings */
+    --sans: "Archivo Variable", system-ui, sans-serif;
+    --mono: "JetBrains Mono Variable", ui-monospace, monospace;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #141414; --text: #ececea; --muted: #a3a39e;
-      --line: #2c2c2a; --accent: #7aa7ff; --card: #1b1b1a;
+      --paper: #11151b;
+      --ink: #e4e8ee;
+      --graphite: #98a2b3;
+      --rule: #2a313b;
+      --bit-off: #1f252e;
+      --trace: #63c49b;
     }
   }
+
+  /* ---------- Base ---------- */
   * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
-    margin: 0; background: var(--bg); color: var(--text); line-height: 1.6;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 1.0625rem;      /* 17px: slightly larger than default for comfortable reading */
+    line-height: 1.6;
+    font-variation-settings: "wdth" 100;
   }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 1.5rem; }
+  a { color: var(--trace); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { text-decoration-thickness: 2px; }
+  /* Visible keyboard focus everywhere */
+  :focus-visible { outline: 2px solid var(--trace); outline-offset: 3px; border-radius: 2px; }
 
-  nav { position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); z-index: 10; }
-  nav .inner {
-    max-width: var(--max); margin: 0 auto; padding: 0.8rem 1.25rem;
-    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;
+  /* Headings use a wider cut of the same family: one typeface, two voices */
+  h1, h2, h3 { font-variation-settings: "wdth" 112; line-height: 1.2; margin: 0; }
+  h2 { font-size: 1.05rem; font-weight: 650; }
+  h3 { font-size: 1.1rem; font-weight: 620; }
+  p { margin: 0; }
+
+  /* ---------- Nav ---------- */
+  nav { border-bottom: 1px solid var(--rule); }
+  .nav-inner { display: flex; justify-content: space-between; align-items: center; height: 60px; }
+  .nav-name { color: var(--ink); text-decoration: none; font-weight: 700; font-variation-settings: "wdth" 115; }
+  nav ul { list-style: none; display: flex; gap: 1.5rem; margin: 0; padding: 0; }
+  nav ul a { color: var(--graphite); text-decoration: none; font-size: 0.95rem; }
+  nav ul a:hover, nav ul a[aria-current="page"] { color: var(--ink); }
+
+  /* ---------- Section layout: heading rail + content ---------- */
+  .section {
+    display: grid;
+    grid-template-columns: var(--rail) 1fr;
+    gap: 2rem;
+    padding: 3rem 0;
+    border-top: 1px solid var(--rule);
   }
-  nav .name { font-weight: 600; color: var(--text); }
-  nav ul { list-style: none; display: flex; gap: 1.1rem; margin: 0; padding: 0; }
-  nav ul a { color: var(--muted); }
-  nav ul a.active { color: var(--text); font-weight: 600; }
+  .section > h2 { padding-top: 0.15rem; }
+  .section-body { max-width: 640px; }     /* keeps line length under ~80 characters */
 
-  main { max-width: var(--max); margin: 0 auto; padding: 0 1.25rem 4rem; }
-  section { padding-top: 2.5rem; }
-  h1 { font-size: 2.2rem; margin: 3rem 0 0.25rem; line-height: 1.2; }
-  h2 { font-size: 1.3rem; margin: 0 0 1rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--line); }
-  h3 { font-size: 1.05rem; margin: 0; }
-  .muted { color: var(--muted); }
-  .tagline { color: var(--muted); margin: 0 0 1.25rem; font-size: 1.1rem; }
+  /* ---------- Shared bits ---------- */
+  .muted { color: var(--graphite); }
+  .stack > * + * { margin-top: 2rem; }    /* vertical rhythm between entries */
+  .tech { color: var(--graphite); font-size: 0.9rem; margin-top: 0.5rem; }
 
-  .links { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-  .btn { border: 1px solid var(--line); background: var(--card); padding: 0.4rem 0.9rem; border-radius: 6px; }
+  /* Markdown on project pages */
+  .prose h2 { font-size: 1.15rem; margin: 2.25rem 0 0.6rem; }
+  .prose p, .prose ul { margin: 0 0 1rem; }
+  .prose ul { padding-left: 1.2rem; }
+  .prose li + li { margin-top: 0.35rem; }
+  .prose code { font-family: var(--mono); font-size: 0.88em; background: var(--bit-off); padding: 0.1rem 0.35rem; border-radius: 3px; }
 
-  .item { margin-bottom: 1.6rem; }
-  .item-head { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; align-items: baseline; }
-  .meta { color: var(--muted); font-size: 0.9rem; }
-  .item p, .item ul { margin: 0.35rem 0 0; }
-  .item ul { padding-left: 1.2rem; }
+  /* ---------- Footer ---------- */
+  /* Rule lives on the inner div so it lines up with the section rules */
+  .foot {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+    color: var(--graphite); font-size: 0.85rem;
+    padding: 2rem 0 3rem;
+    border-top: 1px solid var(--rule);
+  }
 
-  .tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.5rem; }
-  .tag { font-size: 0.78rem; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 0.1rem 0.6rem; }
-
-  /* Skills: fixed-width label column so the tag rows line up */
-  .skill-row { display: grid; grid-template-columns: 110px 1fr; gap: 0.75rem; align-items: start; margin-bottom: 0.6rem; }
-  .skill-row .tags { margin-top: 0; }
-  .skill-group { font-weight: 600; font-size: 0.93rem; padding-top: 0.1rem; }
-  @media (max-width: 500px) { .skill-row { grid-template-columns: 1fr; gap: 0.3rem; } }
-
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
-  .card { display: block; border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 1rem; color: var(--text); }
-  .card:hover { border-color: var(--accent); text-decoration: none; }
-  .card p { margin: 0.4rem 0 0; color: var(--muted); font-size: 0.93rem; }
-
-  /* Markdown output on project pages */
-  .prose h2 { margin-top: 2rem; }
-  .prose code { background: var(--card); border: 1px solid var(--line); padding: 0.1rem 0.3rem; border-radius: 4px; }
-
-  footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 2rem 0; border-top: 1px solid var(--line); }
+  /* ---------- Mobile: rail collapses above content ---------- */
+  @media (max-width: 720px) {
+    .section { grid-template-columns: 1fr; gap: 1rem; padding: 2.25rem 0; }
+    nav ul { gap: 1rem; }
+  }
+  @media (max-width: 420px) {
+    .wrap { padding: 0 1.15rem; }
+    .nav-name { font-size: 0.95rem; }
+    nav ul { gap: 0.85rem; }
+    nav ul a { font-size: 0.88rem; }
+  }
 </style>

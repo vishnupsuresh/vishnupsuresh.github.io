@@ -1,16 +1,26 @@
 ---
-// /projects/ : full list of every project in the collection.
+// /projects/ : every project in the collection, same row component as the home page.
 import Base from "../../layouts/Base.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
 import { getCollection } from "astro:content";
 
 const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
 ---
-<Base title="Projects · Vishnu Suresh">
-  <h1>Projects</h1>
-  <section>
-    <div class="cards">
+<Base title="Projects | Vishnu Suresh">
+  <header class="page-head">
+    <h1>Projects</h1>
+    <p class="muted">Hardware, machine learning, and systems work from class and on my own.</p>
+  </header>
+  <section class="section">
+    <h2>All work</h2>
+    <div class="section-body stack">
       {projects.map((p) => <ProjectCard id={p.id} {...p.data} />)}
     </div>
   </section>
 </Base>
+
+<style>
+  .page-head { padding: 3.5rem 0 2.5rem; }
+  .page-head h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 780; font-variation-settings: "wdth" 122; }
+  .page-head p { margin-top: 0.75rem; max-width: 34em; }
+</style>

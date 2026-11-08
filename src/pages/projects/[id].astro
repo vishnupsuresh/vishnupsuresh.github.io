@@ -1,7 +1,6 @@
 ---
-// Dynamic route: generates one static page per Markdown file at build time.
-// GitHub Pages only serves static files, so getStaticPaths is required:
-// it tells Astro every URL to pre-render.
+// Dynamic route: one static page per Markdown file, generated at build time.
+// GitHub Pages only serves static files, so getStaticPaths lists every URL.
 import Base from "../../layouts/Base.astro";
 import { getCollection, render } from "astro:content";
 
@@ -14,16 +13,36 @@ const { project } = Astro.props;
 const { Content } = await render(project);
 const { title, summary, date, tags, repo } = project.data;
 ---
-<Base title={`${title} · Vishnu Suresh`} description={summary}>
-  <p style="margin-top:2rem"><a href="/projects/">← All projects</a></p>
-  <h1 style="margin-top:0.5rem">{title}</h1>
-  <p class="tagline">{summary}</p>
-  <p class="meta">
-    {date}
-    {repo && <> · <a href={repo} target="_blank" rel="noopener">Source code</a></>}
-  </p>
-  <div class="tags">{tags.map((t) => <span class="tag">{t}</span>)}</div>
-  <article class="prose">
-    <Content />
-  </article>
+<Base title={`${title} | Vishnu Suresh`} description={summary}>
+  <header class="page-head">
+    <a class="back" href="/projects/">All projects</a>
+    <h1>{title}</h1>
+    <p class="lede">{summary}</p>
+  </header>
+
+  <section class="section">
+    <!-- Left rail holds the facts; right column holds the write-up -->
+    <dl class="facts">
+      {date && <><dt>When</dt><dd>{date}</dd></>}
+      <dt>Built with</dt><dd>{tags.join(", ")}</dd>
+      {repo && <><dt>Code</dt><dd><a href={repo} target="_blank" rel="noopener">View on GitHub</a></dd></>}
+    </dl>
+    <article class="section-body prose">
+      <Content />
+    </article>
+  </section>
 </Base>
+
+<style>
+  .page-head { padding: 3rem 0 2.5rem; }
+  .back { font-size: 0.92rem; }
+  .page-head h1 { margin-top: 1rem; font-size: clamp(2rem, 5vw, 3rem); font-weight: 780; font-variation-settings: "wdth" 122; }
+  .lede { margin-top: 0.85rem; max-width: 34em; font-size: 1.15rem; color: var(--graphite); }
+
+  .facts { margin: 0; font-size: 0.92rem; }
+  .facts dt { color: var(--graphite); }
+  .facts dd { margin: 0.1rem 0 1rem; }
+
+  /* First Markdown heading shouldn't push the article down past the rail */
+  .prose :global(h2:first-child) { margin-top: 0; }
+</style>

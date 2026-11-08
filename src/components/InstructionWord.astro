@@ -1,0 +1,90 @@
+---
+// Hero signature: a 32-bit instruction word in the same format as the
+// custom CPU's ISA (6-bit opcode + 26-bit immediate).
+// The immediate encodes 2029 (graduation year); the opcode is arbitrary.
+// Pure HTML/CSS: no JavaScript needed, so it renders instantly and works with JS off.
+const opcode = 0b000101;
+const immediate = 2029;
+const word = (opcode << 26) | immediate;
+
+// MSB first, matching how instruction formats are drawn in textbooks.
+const bits = Array.from({ length: 32 }, (_, i) => (word >>> (31 - i)) & 1);
+const hex = "0x" + (word >>> 0).toString(16).toUpperCase().padStart(8, "0");
+---
+<figure class="iw" aria-label={`32-bit instruction word ${hex}: 6-bit opcode, 26-bit immediate`}>
+  <!-- Two field groups (6 + 26) sized 6fr / 26fr so every bit is the same width
+       and the gap between fields never pushes the row past the screen edge. -->
+  <div class="iw-bits" aria-hidden="true">
+    <div class="field op-field">
+      {bits.slice(0, 6).map((b, i) => (
+        <span class:list={["bit", "op", { on: b === 1 }]} style={`--i:${i}`}>{b}</span>
+      ))}
+    </div>
+    <div class="field imm-field">
+      {bits.slice(6).map((b, j) => (
+        <span class:list={["bit", { on: b === 1 }]} style={`--i:${j + 6}`}>{b}</span>
+      ))}
+    </div>
+  </div>
+  <div class="iw-fields" aria-hidden="true">
+    <span class="f-op">opcode [31:26]</span>
+    <span class="f-imm">immediate [25:0]</span>
+  </div>
+  <figcaption>
+    {hex}: the instruction format from the 32-bit CPU I designed
+  </figcaption>
+</figure>
+
+<style>
+  .iw { margin: 2.5rem 0 0; font-family: var(--mono); }
+
+  /* 32 equal columns; 6 for opcode, 26 for immediate */
+  .iw-bits {
+    display: grid;
+    grid-template-columns: 6fr 26fr;
+    gap: 9px;
+  }
+  .field { display: grid; gap: 3px; }
+  /* minmax(0, 1fr) lets cells shrink below their text width instead of overflowing */
+  .op-field { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .imm-field { grid-template-columns: repeat(26, minmax(0, 1fr)); }
+  .bit {
+    aspect-ratio: 3 / 4;
+    display: grid; place-items: center;
+    font-size: clamp(0.5rem, 1.4vw, 0.8rem);
+    background: var(--bit-off);
+    color: var(--graphite);
+    border-radius: 2px;
+  }
+  .bit.on { background: var(--ink); color: var(--paper); }
+  .bit.op.on { background: var(--trace); }
+
+  .iw-fields {
+    display: grid;
+    grid-template-columns: 6fr 26fr;
+    gap: 9px;
+    margin-top: 0.5rem;
+    font-size: 0.72rem;
+    color: var(--graphite);
+  }
+  .iw-fields span { border-top: 1px solid var(--rule); padding-top: 0.35rem; }
+  .f-op { border-top-color: var(--trace) !important; }
+
+  figcaption { margin-top: 1rem; font-family: var(--sans); font-size: 0.85rem; color: var(--graphite); }
+
+  /* The page's one motion moment: bits latch left to right on load. */
+  @media (prefers-reduced-motion: no-preference) {
+    .bit.on { animation: latch 260ms both; animation-delay: calc(var(--i) * 28ms + 150ms); }
+    @keyframes latch {
+      from { background: var(--bit-off); color: var(--graphite); }
+    }
+  }
+
+  /* On phones the cells are too narrow for digits: show the pattern only */
+  @media (max-width: 520px) {
+    .iw-bits, .iw-fields { gap: 6px; }
+    .field { gap: 2px; }
+    .bit { font-size: 0; aspect-ratio: 1 / 2; }
+    .iw-fields { font-size: 0.62rem; }
+  }
+</style>

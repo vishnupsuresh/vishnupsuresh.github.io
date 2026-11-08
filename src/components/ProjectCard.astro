@@ -1,16 +1,28 @@
 ---
-// Reusable card: used on both the home page and the /projects/ index,
-// so the two lists never drift apart in style.
+// One project as a list row (not a card): title, summary, date, tech.
+// Used on the home page and the /projects/ index so both stay identical.
 interface Props {
   id: string;
   title: string;
   summary: string;
+  date?: string;
   tags: string[];
 }
-const { id, title, summary, tags } = Astro.props;
+const { id, title, summary, date, tags } = Astro.props;
 ---
-<a class="card" href={`/projects/${id}/`}>
-  <h3>{title}</h3>
-  <p>{summary}</p>
-  <div class="tags">{tags.map((t) => <span class="tag">{t}</span>)}</div>
-</a>
+<article class="proj">
+  <div class="proj-head">
+    <h3><a href={`/projects/${id}/`}>{title}</a></h3>
+    {date && <span class="muted proj-date">{date}</span>}
+  </div>
+  <p class="proj-sum">{summary}</p>
+  <p class="tech">{tags.join(", ")}</p>
+</article>
+
+<style>
+  .proj-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+  .proj h3 a { color: var(--ink); text-decoration: none; }
+  .proj h3 a:hover { color: var(--trace); text-decoration: underline; }
+  .proj-date { font-size: 0.88rem; white-space: nowrap; }
+  .proj-sum { margin-top: 0.35rem; }
+</style>
