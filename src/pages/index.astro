@@ -11,33 +11,52 @@ const projects = (await getCollection("projects")).sort((a, b) => a.data.order -
 const featured = projects.slice(0, 4);
 
 const GITHUB = "https://github.com/vishnupsuresh";
-const LINKEDIN = "https://www.linkedin.com/in/YOUR-LINKEDIN"; // TODO
+const LINKEDIN = "https://www.linkedin.com/in/vishnu-suresh-08b8b5284";
+
+// Skills grouped by area, matching the resume so the two never disagree.
+const skills = [
+  { group: "Languages", items: ["Python", "C++", "C", "Java", "SystemVerilog", "HTML"] },
+  { group: "Data & ML", items: ["TensorFlow", "PyTorch", "Pandas", "NumPy", "Streamlit", "Snowflake", "MS SQL Server", "Power BI", "Excel"] },
+  { group: "Systems", items: ["Git", "Linux", "GTKWave", "Raspberry Pi", "Arduino", "ServiceNow"] },
+  { group: "IT & Support", items: ["Microsoft Intune", "SCCM / MDT", "Windows", "Microsoft 365"] },
+];
+
+const courses = [
+  "Data Structures & Algorithms (C++)",
+  "Computer Architecture",
+  "ECE 160 (C)",
+  "CS 101 (Python)",
+  "Linear Algebra",
+  "Probability & Statistics",
+];
 const EMAIL = "vishnups0001@gmail.com";
 
 const experience = [
   {
-    role: "College Aide, IT",
+    role: "College Aide, IT Operations",
     org: "NYC Department of Youth and Community Development",
-    dates: "Present", // TODO: add start date
+    dates: "Jan 2026 – Present",
     points: [
-      "Support ~100 laptops and phones and ~300 PCs; resolve ~25 tickets per week.",
-      "Manage Intune/MDM compliance and Conditional Access; image machines with SCCM and MDT.",
-      "Administer Microsoft 365: Exchange mailboxes, Teams, and account access.",
-      "Built an Excel inventory database for device assignments, now used by IT across the agency.",
+      "Built an Excel inventory tracker for 700+ laptops, desktops, phones, and monitors across 300+ employees, cutting device lookups from 15 minutes to 1 minute.",
+      "Resolved 500+ ServiceNow tickets on device compliance, provisioning, and authentication across Intune/MDM, Windows Hello for Business, and SCCM/MDT.",
+      "Imaged and deployed 100+ laptops and desktops to enterprise compliance standards.",
     ],
   },
   {
-    role: "Math Instructor",
-    org: "Mathnasium",
+    role: "Instructor",
+    org: "Mathnasium Learning Center",
     dates: "Jul 2024 – Aug 2025",
-    points: ["Taught K–12 students one-on-one and in small groups, adapting lessons to each student's level."],
+    points: [
+      "Taught structured math problem-solving to 40+ students in grades K–12.",
+      "Assessed skill gaps with diagnostic tests and tracked individualized learning plans; 89% of students advanced a grade level in 6 months.",
+    ],
   },
 ];
 
 const leadership = [
   { title: "IEEE Student Branch", role: "Board Member" },
   { title: "Cooper OPS", role: "Instructor", note: "Co-teach technical sessions, including one on number systems." },
-  { title: "Cooper Union Basketball Club", role: "Founder" },
+  { title: "Cooper Union Hoops", role: "Founder" },
   { title: "ACM Student Chapter", role: "Founder (in progress)", note: "Starting Cooper Union's first ACM chapter." },
 ];
 ---
@@ -57,10 +76,22 @@ const leadership = [
     <h2>About</h2>
     <p>
       I'm a Computer Science undergraduate at The Cooper Union. I work across hardware, machine learning,
-      and enterprise IT: I've designed a pipelined 32-bit CPU in SystemVerilog, built CNN models for EEG
-      classification, and manage devices for a New York City agency. I'm looking for Summer 2027 internships
+      and enterprise IT: I've designed a pipelined 32-bit CPU in SystemVerilog, trained a CNN that detects brain disorders from EEG
+      data at 85% accuracy, and manage devices for a New York City agency. I'm looking for Summer 2027 internships
       in software, data, and ML.
     </p>
+  </section>
+
+  <section>
+    <h2>Education</h2>
+    <div class="item">
+      <div class="item-head">
+        <h3>The Cooper Union · B.S. in Computer Science</h3>
+        <span class="meta">Expected May 2029</span>
+      </div>
+      <p><span class="muted">GPA:</span> 3.46</p>
+      <p><span class="muted">Relevant coursework:</span> {courses.join(" · ")}</p>
+    </div>
   </section>
 
   <section>
@@ -82,6 +113,16 @@ const leadership = [
       {featured.map((p) => <ProjectCard id={p.id} {...p.data} />)}
     </div>
     <p><a href="/projects/">All projects →</a></p>
+  </section>
+
+  <section>
+    <h2>Skills</h2>
+    {skills.map((s) => (
+      <div class="skill-row">
+        <span class="skill-group">{s.group}</span>
+        <div class="tags">{s.items.map((i) => <span class="tag">{i}</span>)}</div>
+      </div>
+    ))}
   </section>
 
   <section>
