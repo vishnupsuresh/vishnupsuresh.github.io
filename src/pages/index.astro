@@ -1,14 +1,17 @@
 ---
-// Home page: about, experience, featured projects, leadership, contact.
+// Home page: hero, about, education, experience, projects, skills, leadership.
 // Experience and leadership live here as plain data arrays rather than a
 // content collection: they're short and rarely change, so separate files
 // would add overhead without benefit.
 import Base from "../layouts/Base.astro";
 import ProjectCard from "../components/ProjectCard.astro";
+import FeaturedProject from "../components/FeaturedProject.astro";
 import { getCollection } from "astro:content";
 
 const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
-const featured = projects.slice(0, 4);
+// First project with an image is featured large; the rest are list rows.
+const lead = projects.find((p) => p.data.image);
+const rest = projects.filter((p) => p !== lead).slice(0, 3);
 
 const GITHUB = "https://github.com/vishnupsuresh";
 const LINKEDIN = "https://www.linkedin.com/in/vishnu-suresh-08b8b5284";
@@ -66,16 +69,26 @@ const leadership = [
 ---
 <Base>
   <header class="hero">
-    <h1 class="hero-name">Vishnu Suresh</h1>
-    <p class="hero-line">
-      Computer Science student at The Cooper Union. I build hardware and train
-      machine learning models.
-    </p>
-    <div class="hero-links">
-      <a href="/resume.pdf" target="_blank" rel="noopener">Resume</a>
-      <a href={GITHUB} target="_blank" rel="noopener">GitHub</a>
-      <a href={LINKEDIN} target="_blank" rel="noopener">LinkedIn</a>
-      <a href={`mailto:${EMAIL}`}>Email</a>
+    <!-- Decorative dot grid, faded at the edges with a mask; hidden from screen readers -->
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-content">
+      <p class="status"><span class="dot" aria-hidden="true"></span>Open to Summer 2027 internships</p>
+      <h1 class="hero-name">Vishnu Suresh</h1>
+      <p class="hero-line">
+        Computer Science student at The Cooper Union. I build hardware and train
+        machine learning models.
+      </p>
+      <dl class="hero-meta">
+        <div><dt>Degree</dt><dd>B.S. Computer Science</dd></div>
+        <div><dt>Graduating</dt><dd>May 2029</dd></div>
+        <div><dt>Based in</dt><dd>New York</dd></div>
+      </dl>
+      <div class="hero-links">
+        <a class="btn btn-primary" href="/resume.pdf" target="_blank" rel="noopener">View resume</a>
+        <a class="btn" href={GITHUB} target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" href={LINKEDIN} target="_blank" rel="noopener">LinkedIn</a>
+        <a class="btn" href={`mailto:${EMAIL}`}>Email</a>
+      </div>
     </div>
   </header>
 
@@ -108,24 +121,25 @@ const leadership = [
 
   <section class="section">
     <h2>Experience</h2>
-    <div class="section-body stack">
+    <ol class="section-body timeline">
       {experience.map((e) => (
-        <div>
+        <li>
           <div class="entry-head">
             <h3>{e.role}</h3>
             <span class="muted date">{e.dates}</span>
           </div>
           <p class="muted">{e.org}</p>
           <ul class="points">{e.points.map((p) => <li>{p}</li>)}</ul>
-        </div>
+        </li>
       ))}
-    </div>
+    </ol>
   </section>
 
   <section class="section">
     <h2>Projects</h2>
     <div class="section-body stack">
-      {featured.map((p) => <ProjectCard id={p.id} {...p.data} />)}
+      {lead && <FeaturedProject id={lead.id} {...lead.data} image={lead.data.image!} />}
+      {rest.map((p) => <ProjectCard id={p.id} {...p.data} />)}
       <p><a href="/projects/">See all projects</a></p>
     </div>
   </section>
@@ -158,7 +172,29 @@ const leadership = [
 
 <style>
   /* Hero: the name is the loudest type on the site, set in Archivo's widest cut */
-  .hero { padding: 4.5rem 0 3.5rem; }
+  /* overflow: clip keeps the grid's bleed from widening the page on phones */
+  .hero { position: relative; padding: 4.5rem 0 3.5rem; overflow: clip; }
+  .hero-content { position: relative; }   /* sits above the grid */
+
+  /* Graph-paper dots that fade out toward the bottom-right */
+  .hero-grid {
+    position: absolute; inset: 0 -1.5rem;
+    background-image: radial-gradient(color-mix(in srgb, var(--graphite) 45%, transparent) 1.2px, transparent 1.3px);
+    background-size: 22px 22px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 90% at 15% 30%, #000 30%, transparent 75%);
+            mask-image: radial-gradient(ellipse 80% 90% at 15% 30%, #000 30%, transparent 75%);
+    pointer-events: none;
+  }
+
+  .status {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.88rem; font-weight: 550;
+    padding: 0.3rem 0.8rem 0.3rem 0.65rem;
+    border: 1px solid var(--rule); border-radius: 999px;
+    background: var(--card);
+    margin-bottom: 1.5rem;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--trace); box-shadow: 0 0 0 3px color-mix(in srgb, var(--trace) 22%, transparent); }
   .hero-name {
     font-size: clamp(2.6rem, 8vw, 5rem);
     font-weight: 820;
@@ -167,7 +203,33 @@ const leadership = [
     line-height: 1;
   }
   .hero-line { margin-top: 1.25rem; max-width: 34em; font-size: 1.2rem; color: var(--graphite); }
-  .hero-links { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 1.5rem; font-weight: 550; }
+  /* Degree / graduation / location as a compact fact row */
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 0.75rem 2.5rem; margin: 1.75rem 0 0; }
+  .hero-meta dt { font-size: 0.8rem; color: var(--graphite); }
+  .hero-meta dd { margin: 0.1rem 0 0; font-weight: 620; }
+
+  .hero-links { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 2rem; }
+  .btn {
+    display: inline-block; padding: 0.55rem 1.1rem;
+    border: 1px solid var(--rule); border-radius: 6px;
+    background: var(--card); color: var(--ink);
+    font-weight: 560; font-size: 0.95rem; text-decoration: none;
+    transition: border-color 150ms, background 150ms;
+  }
+  .btn:hover { border-color: var(--ink); text-decoration: none; }
+  .btn-primary { background: var(--trace); border-color: var(--trace); color: var(--on-trace); }
+  .btn-primary:hover { border-color: var(--trace); filter: brightness(1.1); }
+
+  /* Experience timeline: vertical rule with a dot per job (jobs are a real sequence) */
+  .timeline { list-style: none; margin: 0; padding: 0 0 0 1.5rem; border-left: 2px solid var(--rule); }
+  .timeline > li { position: relative; }
+  .timeline > li + li { margin-top: 2.25rem; }
+  .timeline > li::before {
+    content: ""; position: absolute; left: calc(-1.5rem - 7px); top: 0.4rem;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--paper); border: 2px solid var(--trace);
+  }
+  .timeline > li:first-child::before { background: var(--trace); }   /* filled = current job */
 
   .entry-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
   .date { font-size: 0.88rem; white-space: nowrap; }

@@ -14,7 +14,9 @@ const projects = defineCollection({
     date: z.string().optional(),    // free text ("Fall 2025") since dates are approximate
     tags: z.array(z.string()).default([]),
     repo: z.string().url().optional(),
-    order: z.number().default(99),  // lower = shown first; avoids sorting by fuzzy dates
+    order: z.number().default(99),
+    image: z.string().optional(),     // path under public/, shown when the project is featured
+    imageAlt: z.string().optional(),  // lower = shown first; avoids sorting by fuzzy dates
   }),
 });
 

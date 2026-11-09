@@ -5,6 +5,8 @@ date: Mar – May 2026
 tags: [SystemVerilog, Python, GTKWave, Computer Architecture]
 repo: https://github.com/Canjap/von-Neumann-architecture
 order: 1
+image: /projects/cpu/sc-waveform.png
+imageAlt: GTKWave trace of the single-cycle CPU running a countdown program
 ---
 
 ## Overview
