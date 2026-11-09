@@ -81,10 +81,10 @@ const leadership = [
       <dl class="hero-meta">
         <div><dt>Degree</dt><dd>B.S. Computer Science</dd></div>
         <div><dt>Graduating</dt><dd>May 2029</dd></div>
-        <div><dt>Based in</dt><dd>New York</dd></div>
+        <div><dt>Based in</dt><dd>New York City</dd></div>
       </dl>
       <div class="hero-links">
-        <a class="btn btn-primary" href="/resume.pdf" target="_blank" rel="noopener">View resume</a>
+        <a class="btn" href="/resume.pdf" target="_blank" rel="noopener">View resume</a>
         <a class="btn" href={GITHUB} target="_blank" rel="noopener">GitHub</a>
         <a class="btn" href={LINKEDIN} target="_blank" rel="noopener">LinkedIn</a>
         <a class="btn" href={`mailto:${EMAIL}`}>Email</a>
@@ -101,7 +101,7 @@ const leadership = [
         700+ devices for a New York City agency. I'm looking for Summer 2027 internships in software, data, and ML.
       </p>
       <p class="para">
-        Outside of class, I play basketball, tennis, and bowling. I founded Cooper Union Hoops, the school's
+        Outside of class, I play basketball, tennis, and bowling with my friends. I founded Cooper Union Hoops, the school's
         basketball club.
       </p>
     </div>
@@ -209,16 +209,15 @@ const leadership = [
   .hero-meta dd { margin: 0.1rem 0 0; font-weight: 620; }
 
   .hero-links { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 2rem; }
+  /* All hero buttons share one style: accent fill */
   .btn {
     display: inline-block; padding: 0.55rem 1.1rem;
-    border: 1px solid var(--rule); border-radius: 6px;
-    background: var(--card); color: var(--ink);
+    border: 1px solid var(--trace); border-radius: 6px;
+    background: var(--trace); color: var(--on-trace);
     font-weight: 560; font-size: 0.95rem; text-decoration: none;
-    transition: border-color 150ms, background 150ms;
+    transition: filter 150ms;
   }
-  .btn:hover { border-color: var(--ink); text-decoration: none; }
-  .btn-primary { background: var(--trace); border-color: var(--trace); color: var(--on-trace); }
-  .btn-primary:hover { border-color: var(--trace); filter: brightness(1.1); }
+  .btn:hover { filter: brightness(1.12); text-decoration: none; }
 
   /* Experience timeline: vertical rule with a dot per job (jobs are a real sequence) */
   .timeline { list-style: none; margin: 0; padding: 0 0 0 1.5rem; border-left: 2px solid var(--rule); }
