@@ -5,7 +5,6 @@
 // would add overhead without benefit.
 import Base from "../layouts/Base.astro";
 import ProjectCard from "../components/ProjectCard.astro";
-import InstructionWord from "../components/InstructionWord.astro";
 import { getCollection } from "astro:content";
 
 const projects = (await getCollection("projects")).sort((a, b) => a.data.order - b.data.order);
@@ -65,8 +64,8 @@ const leadership = [
   <header class="hero">
     <h1 class="hero-name">Vishnu Suresh</h1>
     <p class="hero-line">
-      Computer Science student at The Cooper Union. I build hardware, train models,
-      and keep a city agency's devices running.
+      Computer Science student at The Cooper Union. I build hardware and train
+      machine learning models.
     </p>
     <div class="hero-links">
       <a href="/resume.pdf" target="_blank" rel="noopener">Resume</a>
@@ -74,7 +73,6 @@ const leadership = [
       <a href={LINKEDIN} target="_blank" rel="noopener">LinkedIn</a>
       <a href={`mailto:${EMAIL}`}>Email</a>
     </div>
-    <InstructionWord />
   </header>
 
   <section class="section">
